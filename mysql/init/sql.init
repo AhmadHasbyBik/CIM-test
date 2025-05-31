@@ -1,0 +1,124 @@
+-- Create database
+CREATE DATABASE IF NOT EXISTS CIM;
+USE CIM;
+
+-- Users table
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    fullname VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) DEFAULT 'user',
+    is_admin BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Team members table (renamed from media to team_members)
+CREATE TABLE IF NOT EXISTS team_members (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nama VARCHAR(100) NOT NULL,
+    divisi VARCHAR(100) NOT NULL,
+    subdivisi VARCHAR(100),
+    level INT DEFAULT 0,
+    file_name VARCHAR(255),
+    file_path VARCHAR(255),
+    file_type VARCHAR(100),
+    uploaded_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (uploaded_by) REFERENCES users(id)
+);
+
+-- Portfolio categories
+CREATE TABLE IF NOT EXISTS portfolio_categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Portfolio items
+CREATE TABLE IF NOT EXISTS portfolio (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL,
+    client_name VARCHAR(255),
+    project_date DATE,
+    description TEXT,
+    idea TEXT,
+    cover_image VARCHAR(255),
+    project_url VARCHAR(255),
+    project_url_behance VARCHAR(255),
+    user_id INT,
+    category_id INT,
+    is_featured BOOLEAN DEFAULT FALSE,
+    status ENUM('draft', 'published') DEFAULT 'draft',
+    meta_tittle VARCHAR(255),
+    meta_desc TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (category_id) REFERENCES portfolio_categories(id)
+);
+
+-- Gallery items
+CREATE TABLE IF NOT EXISTS gallery (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    portfolio_id INT NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    file_hash VARCHAR(64) NOT NULL,
+    file_type VARCHAR(100) NOT NULL,
+    uploaded_by INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (portfolio_id) REFERENCES portfolio(id),
+    FOREIGN KEY (uploaded_by) REFERENCES users(id),
+    UNIQUE KEY (file_hash)
+);
+
+-- Service categories
+CREATE TABLE IF NOT EXISTS service_categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Services
+CREATE TABLE IF NOT EXISTS services (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL,
+    short_description TEXT,
+    full_description TEXT,
+    icon_feature1 VARCHAR(50),
+    text_feature1 TEXT,
+    nama_feature1 VARCHAR(100),
+    icon2 VARCHAR(50),
+    nama_feature2 VARCHAR(100),
+    text_feature2 TEXT,
+    featured_image VARCHAR(255),
+    detail_service_image VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    display_order INT DEFAULT 0,
+    meta_title VARCHAR(255),
+    meta_description TEXT,
+    category_id INT,
+    user_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES service_categories(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Testimonials
+CREATE TABLE IF NOT EXISTS testimonials (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    company VARCHAR(100),
+    message TEXT NOT NULL,
+    photo VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
