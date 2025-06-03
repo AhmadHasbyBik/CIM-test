@@ -81,7 +81,7 @@ class User(UserMixin):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         try:
-            cursor.execute("SELECT * FROM users WHERE username = %s OR email = %s", (identifier, identifier))
+            cursor.execute("SELECT * FROM `users` WHERE username = %s OR email = %s", (identifier, identifier))
             row = cursor.fetchone()
             if row:
                 return User(
@@ -177,7 +177,7 @@ class TeamMember:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         try:
-            cursor.execute("SELECT * FROM team_members ORDER BY created_at DESC")
+            cursor.execute("SELECT * FROM media ORDER BY created_at DESC")
             members = []
             for row in cursor.fetchall():
                 member = TeamMember(
@@ -203,7 +203,7 @@ class TeamMember:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         try:
-            cursor.execute("SELECT * FROM team_members WHERE id = %s", (member_id,))
+            cursor.execute("SELECT * FROM media WHERE id = %s", (member_id,))
             row = cursor.fetchone()
             if row:
                 return TeamMember(
@@ -229,7 +229,7 @@ class TeamMember:
         try:
             if self.id is None:  # Insert new
                 cursor.execute(
-                    "INSERT INTO team_members (nama, divisi, subdivisi, level, file_name, file_path, file_type, uploaded_by, created_at) "
+                    "INSERT INTO media (nama, divisi, subdivisi, level, file_name, file_path, file_type, uploaded_by, created_at) "
                     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())",
                     (self.nama, self.divisi, self.subdivisi, self.level, self.file_name, 
                      self.file_path, self.file_type, self.uploaded_by)
@@ -237,7 +237,7 @@ class TeamMember:
                 self.id = cursor.lastrowid
             else:  # Update existing
                 cursor.execute(
-                    "UPDATE team_members SET nama = %s, divisi = %s, subdivisi = %s, level=%s, file_name = %s, "
+                    "UPDATE media SET nama = %s, divisi = %s, subdivisi = %s, level=%s, file_name = %s, "
                     "file_path = %s, file_type = %s, uploaded_by = %s WHERE id = %s",
                     (self.nama, self.divisi, self.subdivisi, self.level, self.file_name, 
                      self.file_path, self.file_type, self.uploaded_by, self.id)
@@ -258,7 +258,7 @@ class TeamMember:
         conn = get_db_connection()
         cursor = conn.cursor()
         try:
-            cursor.execute("DELETE FROM team_members WHERE id = %s", (self.id,))
+            cursor.execute("DELETE FROM media WHERE id = %s", (self.id,))
             conn.commit()
             return cursor.rowcount > 0
         except Exception as e:

@@ -158,7 +158,6 @@ def team_management():
     members = TeamMember.get_all()
     return render_template('team_management.html', members=members)
 
-
 @app.route('/team_member/<int:member_id>', methods=['GET', 'PUT', 'DELETE'])
 @login_required
 @is_admin
@@ -1110,7 +1109,7 @@ def about_us():
                 file_name,
                 created_at,
                 level
-            FROM team_members
+            FROM media
             WHERE file_name IS NOT NULL
             ORDER BY 
                 CASE 
@@ -1212,16 +1211,14 @@ def portfolio():
             
     except Exception as e:
         print(f"Error fetching portfolio data: {e}")
-        flash('Error loading portfolio data', 'danger')
         categories = []
         portfolios = []
     finally:
-        if 'cursor' in locals():
-            cursor.close()
-        if 'conn' in locals():
-            conn.close()
+        cursor.close()
+        conn.close()
     
     return render_template('portofolio.html', categories=categories, portfolios=portfolios)
+
 
 @app.route('/contact-us')
 def contact_us():

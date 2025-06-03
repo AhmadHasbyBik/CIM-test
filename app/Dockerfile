@@ -18,5 +18,9 @@ EXPOSE 7860
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl --fail http://localhost:7860/health || exit 1
 
+RUN apt-get update && apt-get install -y tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata
+    
 # Command to run the application
 CMD ["gunicorn", "-b", "0.0.0.0:7860", "app:app"]

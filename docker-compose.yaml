@@ -1,17 +1,21 @@
 version: '3.8'
 
 services:
-  # Database MySQL
   db:
     image: mysql:8.0
     container_name: mysql_db
-    restart: unless-stopped
-    env_file: .env
+    command: 
+      - bash
+      - -c
+      - |
+        chmod +x /docker-entrypoint-initdb.d/init.sh
+        exec docker-entrypoint.sh mysqld
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-defaultrootpassword}  # Add default value
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Jakarta
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql/conf:/etc/mysql/conf.d
@@ -22,10 +26,10 @@ services:
       - app-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
-      retries: 10
+      interval: 10s
+      timeout: 30s
+      retries: 20
 
-  # WAHA Service
   waha:
     image: devlikeapro/waha
     container_name: waha
@@ -40,9 +44,9 @@ services:
     networks:
       - app-network
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
-  # Web Application
   web:
     build: ./app
     container_name: web_app
